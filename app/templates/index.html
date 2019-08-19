@@ -5,4 +5,13 @@
     {% for post in posts %}
     <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
     {% endfor %}
+
+	<form action="{{ url_for('.upload') }}" method=post enctype=multipart/form-data>
+		<div class="form-group">
+	  		<label for="exampleInputFile">上傳檔案</label>
+	  		<input type="file" name="file">
+	  		<p class="help-block">上傳檔案</p>
+	  		<button type="submit" class="btn btn-default">上傳</button>
+		</div>
+	</form>
 {% endblock %}

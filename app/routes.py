@@ -4,22 +4,14 @@ from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
+from werkzeug.utils import secure_filename
+import os, sys
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template("index.html", title='Home Page', posts=posts)
+    return render_template("index.html", title='Home Page')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -56,3 +48,22 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+def allowed_file(filename):
+	return '.' in filename and \
+		   filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/upload', methods=['POST'])
+def upload():
+	if request.method == 'POST':
+		f = request.files['file']
+		if f and '.' in f.filename and f.filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']:
+			filename = secure_filename(f.filename)
+			directory = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+			if not os.path.exists(directory):
+				os.makedirs(directory)
+			path = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], filename)
+			f.save(path)
+		flash('File successfully uploaded')
+		return redirect(url_for('index'))
+	return render_template_string("only support POST")
