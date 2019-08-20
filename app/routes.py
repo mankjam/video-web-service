@@ -56,14 +56,15 @@ def allowed_file(filename):
 @app.route('/upload', methods=['POST'])
 def upload():
 	if request.method == 'POST':
-		f = request.files['file']
-		if f and '.' in f.filename and f.filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']:
-			filename = secure_filename(f.filename)
-			directory = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
-			if not os.path.exists(directory):
-				os.makedirs(directory)
-			path = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], filename)
-			f.save(path)
-		flash('File successfully uploaded')
+		f_list = request.files.getlist('files')
+		directory = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		for f in f_list:
+			if f and '.' in f.filename and f.filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']:
+				filename = secure_filename(f.filename)
+				path = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], filename)
+				f.save(path)
+		flash('File(s) successfully uploaded')
 		return redirect(url_for('index'))
 	return render_template_string("only support POST")
