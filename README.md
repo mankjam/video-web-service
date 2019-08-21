@@ -13,6 +13,7 @@ pip install -r requirements.txt
 ---
 use
 ```
+flask db upgrade
 flask run
 ```
 to run on local
